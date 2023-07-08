@@ -1,61 +1,31 @@
 import NoteContext from './NoteContext'
 import { useState } from 'react'
+import axios from 'axios'
 
 const NoteState = (props) => {
 
-  const noteInitials =
-    [
-      {
-        "_id": "649e436f3125a8d5732ba023",
-        "title": "Harry Potter",
-        "description": "This is fantastic movie of the world",
-        "tag": "Movie",
-        "user": "649bf6c3e1ebc82ac042cdea",
-        "createdAt": "2023-06-30T02:52:31.609Z",
-        "updatedAt": "2023-06-30T02:52:31.609Z",
-        "__v": 0
-      },
-      {
-        "_id": "64a438763058961898dc2679",
-        "title": "SuperMan",
-        "description": "This is fantastic movie of the world",
-        "tag": "Movie",
-        "user": "649bf6c3e1ebc82ac042cdea",
-        "createdAt": "2023-07-04T15:19:18.606Z",
-        "updatedAt": "2023-07-04T15:19:18.606Z",
-        "__v": 0
-      },
-      {
-        "_id": "64a438813058961898dc267c",
-        "title": "Thor",
-        "description": "This is fantastic movie of the world",
-        "tag": "Movie",
-        "user": "649bf6c3e1ebc82ac042cdea",
-        "createdAt": "2023-07-04T15:19:29.263Z",
-        "updatedAt": "2023-07-04T15:19:29.263Z",
-        "__v": 0
-      }
-    ]
+  const url = "https://living-possible-wish.glitch.me"
 
+  const [notes, setNotes] = useState([])
 
-  const [notes, setNotes] = useState(noteInitials)
+  const getNotes = async () => {
+    await axios.get(`${url}/getNotes`, { headers: { 'x-api-key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDliZjZjM2UxZWJjODJhYzA0MmNkZWEiLCJpYXQiOjE2ODc5NDI4NTJ9.M_Dpz9mYvDFGYlkbHpf942VDWWKTrVSEhgOra3tx9-A ' } })
+      .then((res) => { setNotes(res.data.message) })
+      .catch((err) => { console.log(err.message) })
+  }
 
   //Add Note
-  const addNote = (note) => {
+  const addNote = async (note) => {
 
-    const sample = {
-      "_id": "64a438813058961868dc267c",
-      "title": note.title,
-      "description": note.description,
-      "tag": note.tag,
-      "user": "649bf6c3e1ebc82ac042cdea",
-      "createdAt": "2023-07-04T15:19:29.263Z",
-      "updatedAt": "2023-07-04T15:19:29.263Z",
-      "__v": 0
-    }
-    setNotes(notes.concat(sample))
-    console.log(notes)
-    // console.log(notes.message)
+    const { title, description, tag } = note
+
+    await axios.post(`${url}/createNote`, { title, description, tag }, { headers: { 'x-api-key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDliZjZjM2UxZWJjODJhYzA0MmNkZWEiLCJpYXQiOjE2ODc5NDI4NTJ9.M_Dpz9mYvDFGYlkbHpf942VDWWKTrVSEhgOra3tx9-A ' } })
+      .then((res) => { console.log(res.data) }, setTimeout(() => {
+        getNotes()
+      }, 5000))
+      .catch((err) => { console.log(err.message) })
+
+    // setNotes(notes.concat(sample))
   }
 
   //Edit Note
@@ -63,14 +33,19 @@ const NoteState = (props) => {
 
   }
   //Delete Note 
-  const deleteNote = (id) => {
-    console.log("Deleting note with id - " + id)
-    const newNotes = notes.filter((note) => { return note._id !== id })
-    setNotes(newNotes)
+  const deleteNote = async (id) => {
+    // console.log("Deleting note with id - " + id)
+    await axios.delete(`${url}/deleteNote/${id}`, { headers: { 'x-api-key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDliZjZjM2UxZWJjODJhYzA0MmNkZWEiLCJpYXQiOjE2ODc5NDI4NTJ9.M_Dpz9mYvDFGYlkbHpf942VDWWKTrVSEhgOra3tx9-A ' } })
+      .then(() => { console.log("Deleted note with id - " + id) }, setTimeout(() => {
+        getNotes()
+      }, 5000))
+      .catch((err) => { console.log(err.message) })
+    // const newNotes = notes.filter((note) => { return note._id !== id })
+    // setNotes(newNotes)
   }
 
   return (
-    <NoteContext.Provider value={{ notes, addNote, editNote, deleteNote }} >
+    <NoteContext.Provider value={{ notes, addNote, editNote, deleteNote, getNotes }} >
       {props.children}
     </NoteContext.Provider>
   )
