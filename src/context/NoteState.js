@@ -4,7 +4,7 @@ import axios from 'axios'
 
 const NoteState = (props) => {
 
-  const url = "http://localhost:4000"
+  const url = "https://living-possible-wish.glitch.me"
 
   const [notes, setNotes] = useState([])
 
