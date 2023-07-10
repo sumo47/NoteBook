@@ -1,19 +1,8 @@
 import React from 'react'
-// import NoteContext from '../context/NoteContext'
 
-
-function About() {
-
-    // const a = useContext(NoteContext)
-
-    // useEffect(() => {
-    //     a.update()
-    //     // eslint-disable-next-line
-    // }, [])
-
-
+function Modal() {
     return (
-        <div>
+        <>
             <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                 Launch demo modal
             </button>
@@ -37,8 +26,8 @@ function About() {
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 
-export default About
+export default Modal
