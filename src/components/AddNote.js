@@ -21,20 +21,21 @@ function Form() {
       <form className='my-3'>
         <div className="mb-3">
           <label htmlFor="title" className="form-label">Title</label>
-          <input type="text" className="form-control" id="title" aria-describedby="emailHelp" onChange={onChange} />
+          <input type="text" className="form-control" id="title" aria-describedby="emailHelp" onChange={onChange} minLength={5} required />
         </div>
         <div className="mb-3">
           <label htmlFor="description" className="form-label">Description</label>
-          <textarea type="text" className="form-control" id="description" onChange={onChange} />
+          <textarea type="text" className="form-control" id="description" onChange={onChange} minLength={5} required/>
         </div>
         <div className="mb-3">
           <label htmlFor="tag" className="form-label" >Tag</label>
           <input type="text" className="form-control" id="tag" onChange={onChange} />
         </div>
-        <button type="submit" className="btn btn-primary" onClick={handleClick}>Add Note</button>
+        <button type="submit" className="btn btn-primary" onSubmit={handleClick}>Add Note</button>
       </form>
     </div>
   )
 }
 
+//! What is different between onClick and onSubmit
 export default Form
