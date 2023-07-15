@@ -12,14 +12,14 @@ function Notes() {
         // eslint-disable-next-line
     }, [])
 
-    const [value, setValue] = useState({id:"", title: "", description: "", tag: "" })
+    const [value, setValue] = useState({ id: "", title: "", description: "", tag: "Default" })
 
     const onChange = (e) => {
         setValue({ ...value, [e.target.id]: e.target.value })
         // console.log(value)
     }
 
-    const handleClick = () => {
+    const handleClick = (e) => {
         editNote(value)
         refClose.current.click()
     }
@@ -29,7 +29,7 @@ function Notes() {
 
     const updateNote = (note) => {
         ref.current.click()
-        setValue({id:note._id, title:note.title, description:note.description, tag:note.tag})
+        setValue({ id: note._id, title: note.title, description: note.description, tag: note.tag })
         // console.log(note)
     }
 
@@ -40,16 +40,19 @@ function Notes() {
             Launch demo modal
         </button>
 
-        <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div  className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="exampleModalLabel">Edit Note - {value.title}</h5>
+                        <h5 className="modal-title mx-5" id="exampleModalLabel">Edit Note - {value.title}</h5>
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div className="modal-body">
+                        <label htmlFor="title" className='text-primary mx-2 mb-2'>Title</label>
                         <input type="text" className='form-control' placeholder='Title' id="title" value={value.title} onChange={onChange} /><br />
+                        <label htmlFor="Description" className='text-primary mx-2 mb-2'>Description</label>
                         <input type="text" className='form-control' placeholder='Description' id="description" value={value.description} onChange={onChange} /><br />
+                        <label htmlFor="Tag" className='text-primary mx-2 mb-2'>Tag</label>
                         <input type="text" className='form-control' placeholder='Tag' id="tag" value={value.tag} onChange={onChange} />
                     </div>
                     <div className="modal-footer">
@@ -63,7 +66,7 @@ function Notes() {
         <div className='container row my-3'>
             <h2>Your Notes</h2>
             <div className="container bg-danger mx-3">
-            {notes.length === 0 && "No notes to Display"}
+                {notes.length === 0 && "No notes to Display"}
             </div>
             {notes.map((note) => {
                 return <Noteitem key={note._id} updateNote={updateNote} note={note} />

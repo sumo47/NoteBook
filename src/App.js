@@ -4,22 +4,26 @@ import Home from './components/Home'
 import About from './components/About'
 import NoteState from './context/NoteState'
 import Alert from '../src/components/Alert'
+import Login from './components/Login'
+import SignUp from './components/SignUp'
 
 function App() {
   return (
-    <NoteState>
-      <Router>
+    <Router>
+      <NoteState>
         <Navbar />
-        <Alert/>
-       <div className="container">
-       <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          
-        </Routes>
-       </div>
-      </Router>
+        <Alert />
+        <div className="container">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signUp" element={<SignUp />} />
+
+          </Routes>
+        </div>
       </NoteState>
+    </Router>
   );
 }
 
