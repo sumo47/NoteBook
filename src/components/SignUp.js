@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react'
 import NoteContext from '../context/NoteContext'
 
-function SignUp() {
+function SignUp(props) {
 
   const { SignUp } = useContext(NoteContext)
+  const {showAlert} = props
 
   const [state, setState] = useState({ name: '', email: '', password: '' })
 
@@ -13,7 +14,7 @@ function SignUp() {
 
   const handleClick = (e) => {
     e.preventDefault()
-    SignUp(state)
+    SignUp(state, showAlert)
   }
 
   return (
@@ -29,16 +30,19 @@ function SignUp() {
         </div>
         <div className="form-group">
           <label htmlFor="exampleInputPassword">Password</label>
-          <input type="password" className="form-control mb-3" id="password" onChange={onChange} required placeholder="Password" />
+          <input type="password" className="form-control mb-3" id="password" onChange={onChange} required minLength={5} placeholder="Password" />
         </div>
         <div className="form-group">
           <label htmlFor="exampleInputPassword">Confirm Password</label>
-          <input type="text" className="form-control mb-3" id="confirm-password" onChange={onChange} required placeholder="Confirm Password" />
+          <input type="text" className="form-control mb-3" id="confirm-password" onChange={onChange} minLength={5} required placeholder="Confirm Password" />
         </div>
         <button type="submit" className="btn btn-primary">SignUp</button>
       </form>
     </div>
+
   )
+
+ 
 }
 
 export default SignUp

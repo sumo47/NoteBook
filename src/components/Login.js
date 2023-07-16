@@ -2,7 +2,8 @@ import React, { useContext, useState } from 'react'
 import NoteContext from '../context/NoteContext'
 
 
-function Login() {
+function Login(props) {
+    const {showAlert} = props
     const { login } = useContext(NoteContext)
     const [state, setState] = useState({ email: "", password: "" })
 
@@ -12,13 +13,13 @@ function Login() {
 
     const handleClick = (e) => {
         e.preventDefault()
-        login(state)
-     
+        login(state, showAlert)
     }
 
     return (
         <div>
             <form onSubmit={handleClick}>
+                <h2 className='mt-5'>Please Login to continue Notebook</h2>
                 <div className="form-group">
                     <label htmlFor="email">Email address</label>
                     <input onChange={onChange} type="email" className="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email" />

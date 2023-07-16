@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react'
 import NoteContext from '../context/NoteContext'
 
-function Form() {
+function Form(props) {
 
+  const {showAlert} = props
   let { addNote } = useContext(NoteContext)
   const [note, setNotes] = useState({ title: "", description: "", tag: "General" })
 
@@ -12,13 +13,14 @@ function Form() {
 
   const handleClick = (e) => {
     e.preventDefault() // To avoid reload page
-    addNote(note)
+    addNote(note, showAlert)
     setNotes({ title: "", description: "", tag: "" })
+    props.showAlert("Added successfully!", 'success')
   }
 
   return (
-    <div className="container">
-      <h1>Add Note</h1>
+    <div className="container mt-3">
+      <h1 className='text-center'>Add Note</h1>
       <form className='my-3' onSubmit={handleClick}>
         <div className="mb-3">
           <label htmlFor="title" className="form-label">Title</label>
