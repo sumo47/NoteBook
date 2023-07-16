@@ -5,15 +5,14 @@ import { useNavigate } from 'react-router-dom'
 
 
 function Notes(props) {
-    const {showAlert} = props
+    const { showAlert } = props
     const { notes, getNotes, editNote } = useContext(NoteContext)
     const Navigate = useNavigate()
 
     useEffect(() => {
-
-        if(localStorage.getItem('x-api-key')){
+        if (localStorage.getItem('x-api-key')) {
             getNotes()
-        }else{
+        } else {
             Navigate('/Login')
         }
         // eslint-disable-next-line
@@ -47,7 +46,7 @@ function Notes(props) {
             Launch demo modal
         </button>
 
-        <div  className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
@@ -64,7 +63,7 @@ function Notes(props) {
                     </div>
                     <div className="modal-footer">
                         <button ref={refClose} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Descard</button>
-                        <button type="button"  disabled={value.title.length < 5 || value.description.length < 5} className="btn btn-success" onClick={handleClick} >Update Note</button>
+                        <button type="button" disabled={value.title.length < 5 || value.description.length < 5} className="btn btn-success" onClick={handleClick} >Update Note</button>
                     </div>
                 </div>
             </div>
