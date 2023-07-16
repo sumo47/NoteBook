@@ -6,8 +6,8 @@ import axios from 'axios'
 
 const NoteState = (props) => {
 
-  const [Name, setName] = useState()
-  let user = Name
+  // const [Name, setName] = useState()
+  // let user = Name
 
 
   // const url = "https://living-possible-wish.glitch.me";
@@ -29,12 +29,11 @@ const NoteState = (props) => {
         const token = res.data.token
         localStorage.setItem('x-api-key', token)
         showAlert("Logged in succcessfully!", "success")
-        setName(res.data.name)
         navigate('/')
       })
       .catch((err) => {
         // Wow what a nice logic // err will not console everytime while error occurs by user
-        if (!err.response.data.status) {
+        if (err.response.data.status === false) {
           showAlert(`${err.response.data.message}`, "danger")
         } else {
           console.log(err)
@@ -150,7 +149,7 @@ const NoteState = (props) => {
   }
 
   return (
-    <NoteContext.Provider value={{ notes, addNote, editNote, deleteNote, getNotes, login, SignUp, user }} >
+    <NoteContext.Provider value={{ notes, addNote, editNote, deleteNote, getNotes, login, SignUp}} >
       {props.children}
     </NoteContext.Provider>
   )
