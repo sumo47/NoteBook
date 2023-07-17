@@ -4,7 +4,7 @@ import NoteContext from '../context/NoteContext'
 function SignUp(props) {
 
   const { SignUp } = useContext(NoteContext)
-  const {showAlert} = props
+  const { showAlert } = props
 
   const [state, setState] = useState({ name: '', email: '', password: '' })
 
@@ -19,6 +19,7 @@ function SignUp(props) {
 
   return (
     <div>
+      <h2 className='mt-5'>Create an Account to use Notebook</h2>
       <form onSubmit={handleClick}>
         <div className="form-group">
           <label htmlFor="name">Name</label>
@@ -39,10 +40,7 @@ function SignUp(props) {
         <button type="submit" className="btn btn-primary">SignUp</button>
       </form>
     </div>
-
   )
-
- 
 }
 
 export default SignUp
