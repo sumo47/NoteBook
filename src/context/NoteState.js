@@ -5,18 +5,17 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const NoteState = (props) => {
+  const [loading , setLoading] = useState(false)
 
   // const [Name, setName] = useState()
   // let user = Name
 
 
-  const url = "https://living-possible-wish.glitch.me";
-  // const url = "http://localhost:4000";
+  // const url = "https://living-possible-wish.glitch.me";
+  const url = "http://localhost:4000";
 
   const [notes, setNotes] = useState([])
   let navigate = useNavigate()
-
-
 
 
   //*Login
@@ -24,6 +23,7 @@ const NoteState = (props) => {
 
     const { email, password } = credential
 
+    setLoading(true)
     await axios.post(`${url}/login`, { email, password })
       .then((res) => {
         const token = res.data.token
@@ -40,6 +40,8 @@ const NoteState = (props) => {
         }
 
       })
+      setLoading(false)
+
   }
 
 
@@ -149,7 +151,7 @@ const NoteState = (props) => {
   }
 
   return (
-    <NoteContext.Provider value={{ notes, addNote, editNote, deleteNote, getNotes, login, SignUp}} >
+    <NoteContext.Provider value={{ notes, addNote, editNote, deleteNote, getNotes, login, SignUp, loading }} >
       {props.children}
     </NoteContext.Provider>
   )

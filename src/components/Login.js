@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react'
 import NoteContext from '../context/NoteContext'
+import Loading from './Loading'
 
 
 function Login(props) {
     const {showAlert} = props
-    const { login } = useContext(NoteContext)
+    const { login, loading } = useContext(NoteContext)
     const [state, setState] = useState({ email: "", password: "" })
 
     const onChange = (e) => {
@@ -17,7 +18,7 @@ function Login(props) {
     }
 
     return (
-        <div>
+        <div>{loading? <Loading/>:
             <form onSubmit={handleClick}>
                 <h2 className='mt-5'>Please Login to continue Notebook</h2>
                 <div className="form-group">
@@ -30,7 +31,7 @@ function Login(props) {
                     <input onChange={onChange} type="password" className="form-control" id="password" placeholder="Password" />
                 </div>
                 <button type="submit" className="btn btn-primary my-3">Login</button>
-            </form>
+            </form>}
         </div>
     )
 }

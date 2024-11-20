@@ -71,7 +71,7 @@ function Notes(props) {
 
         <div className='container row my-3'>
             <h2>Your Notes</h2>
-            <div className="container bg-danger mx-3">
+            <div className="container text-danger mx-3">
                 {notes.length === 0 && "No notes to Display"}
             </div>
             {notes.map((note) => {

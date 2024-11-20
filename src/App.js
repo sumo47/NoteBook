@@ -8,10 +8,10 @@ import Login from './components/Login'
 import SignUp from './components/SignUp'
 import { useState } from 'react'
 
+
 function App() {
 
   const [alert, setAlert] = useState(null)
-
 
   const alertFunction = (message, type) => {
     setAlert({
@@ -34,7 +34,6 @@ function App() {
             <Route path="/about" element={<About showAlert={alertFunction} />} />
             <Route path="/login" element={<Login showAlert={alertFunction} />} />
             <Route path="/signUp" element={<SignUp showAlert={alertFunction} />} />
-
           </Routes>
         </div>
       </NoteState>
