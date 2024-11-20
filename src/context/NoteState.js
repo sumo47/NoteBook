@@ -11,8 +11,8 @@ const NoteState = (props) => {
   // let user = Name
 
 
-  // const url = "https://living-possible-wish.glitch.me";
-  const url = "http://localhost:4000";
+  const url = "https://living-possible-wish.glitch.me";
+  // const url = "http://localhost:4000";
 
   const [notes, setNotes] = useState([])
   let navigate = useNavigate()
