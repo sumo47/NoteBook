@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const NoteState = (props) => {
-  const [loading , setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   // const [Name, setName] = useState()
   // let user = Name
@@ -40,7 +40,7 @@ const NoteState = (props) => {
         }
 
       })
-      setLoading(false)
+    setLoading(false)
 
   }
 
@@ -66,11 +66,26 @@ const NoteState = (props) => {
 
 
   //*GetNotes
-  const getNotes = async () => {
-    await axios.get(`${url}/getNotes`, { headers: { 'x-api-key': localStorage.getItem('x-api-key') } })
-      .then((res) => { setNotes(res.data.message) })
-      .catch((err) => { console.log(err.message) })
-  }
+  const getNotes = async (startDate, endDate) => {
+    try {
+      // Construct query parameters dynamically
+      const params = {};
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+
+      const newUrl = `${url}/getNotes?${new URLSearchParams(params).toString()}`;
+
+      // Make the API call
+      const { data } = await axios.get(newUrl, {
+        headers: { 'x-api-key': localStorage.getItem('x-api-key') }
+      });
+
+      setNotes(data.message);
+    } catch (error) {
+      console.error('Error fetching notes:', error.message);
+    }
+  };
+
 
 
   //*Add Note

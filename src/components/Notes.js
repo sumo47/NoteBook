@@ -7,6 +7,10 @@ import { useNavigate } from 'react-router-dom'
 function Notes(props) {
     const { showAlert } = props
     const { notes, getNotes, editNote } = useContext(NoteContext)
+    const [startDate, setStartDate] = useState("")
+    const [endDate, setEndDate] = useState("")
+
+
     const Navigate = useNavigate()
 
     useEffect(() => {
@@ -45,6 +49,36 @@ function Notes(props) {
         <button type="button" ref={ref} className="d-none btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
             Launch demo modal
         </button>
+
+        <div className='container my-3'>
+            <h3>Filter note by date </h3>
+            <div className='row'>
+                <div className='col-md-4'>
+                    <label htmlFor="startDate" className='form-label'>start Date</label>
+                    <input type="date"
+                        id='startDate'
+                        className='form-control'
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)} />
+                </div>
+                <div className='col-md-4'>
+                    <label htmlFor="startDate" className='form-label'>End Date</label>
+                    <input type="date"
+                        id='endDate'
+                        className='form-control'
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)} />
+
+                </div>
+                <div className='col-md-4 d-flex align-items-end mt-2'>
+                    <button className='btn btn-primary'
+                        onClick={() => getNotes(startDate, endDate)}
+                    >filter</button>
+                </div>
+            </div>
+
+        </div>
+
 
         <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div className="modal-dialog">

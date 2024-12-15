@@ -5,8 +5,11 @@ function Noteitem(props) {
 
     const {showAlert} = props
     const {deleteNote} = useContext(NoteContext)
-
     const { note, updateNote } = props;
+    console.log(note)
+    const formattedDate = note?.createdAt?.slice(0,10).split("-").reverse().join("-")
+
+
 
     return (
         <div className='col-md-4'>
@@ -19,6 +22,7 @@ function Noteitem(props) {
                     </div>
                     <p className='card-text'> {note.description}</p>
                     <p className='card-text'> {note.tag}</p>
+                    <p className='card-text'> {formattedDate}</p>
 
                 </div>
             </div>
