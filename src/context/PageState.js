@@ -7,7 +7,7 @@ const PageState = (props) => {
   const [currentPage, setCurrentPage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const url = "https://living-possible-wish.glitch.me";
+  const url = "https://notebookbackend.glitch.me";
   // const url = "http://localhost:4000";
 
   // Clear state when switching accounts
