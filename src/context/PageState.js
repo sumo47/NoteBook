@@ -10,10 +10,21 @@ const PageState = (props) => {
   const url = "https://notebookbackend.glitch.me";
   // const url = "http://localhost:4000";
 
+  // Custom setCurrentPage function that also updates localStorage
+  const updateCurrentPage = (page) => {
+    if (page) {
+      localStorage.setItem('currentPageId', page._id);
+      localStorage.setItem('currentPageTitle', page.title);
+    }
+    setCurrentPage(page);
+  };
+
   // Clear state when switching accounts
   const clearState = () => {
     setPages([]);
     setCurrentPage(null);
+    localStorage.removeItem('currentPageId');
+    localStorage.removeItem('currentPageTitle');
   };
 
   // Get all pages
@@ -23,11 +34,36 @@ const PageState = (props) => {
       const response = await axios.get(`${url}/getPages`, { 
         headers: { 'x-api-key': localStorage.getItem('x-api-key') } 
       });
-      setPages(response.data.message || []);
       
-      // Set current page to first page if no current page is selected
-      if (response.data.message && response.data.message.length > 0 && !currentPage) {
-        setCurrentPage(response.data.message[0]);
+      const fetchedPages = response.data.message || [];
+      setPages(fetchedPages);
+      
+      if (fetchedPages.length > 0) {
+        // Try to restore the previously selected page from localStorage
+        const savedPageId = localStorage.getItem('currentPageId');
+        
+        if (savedPageId) {
+          // Find the saved page in the fetched pages
+          const savedPage = fetchedPages.find(page => page._id === savedPageId);
+          
+          if (savedPage) {
+            // If the saved page exists in the fetched pages, set it as current
+            setCurrentPage(savedPage);
+            console.log("Restored saved page:", savedPage.title);
+          } else {
+            // If the saved page doesn't exist anymore, use the first page
+            setCurrentPage(fetchedPages[0]);
+            localStorage.setItem('currentPageId', fetchedPages[0]._id);
+            localStorage.setItem('currentPageTitle', fetchedPages[0].title);
+            console.log("Saved page not found, using first page");
+          }
+        } else if (!currentPage) {
+          // If no saved page and no current page, use the first page
+          setCurrentPage(fetchedPages[0]);
+          localStorage.setItem('currentPageId', fetchedPages[0]._id);
+          localStorage.setItem('currentPageTitle', fetchedPages[0].title);
+          console.log("No saved page, using first page");
+        }
       }
     } catch (error) {
       console.error("Error fetching pages:", error);
@@ -71,6 +107,10 @@ const PageState = (props) => {
       );
       
       if (response.data.status) {
+        // If we're updating the current page, update localStorage too
+        if (currentPage && currentPage._id === id) {
+          localStorage.setItem('currentPageTitle', title);
+        }
         await getPages();
         showAlert("Page updated successfully!", "success");
       }
@@ -101,7 +141,15 @@ const PageState = (props) => {
         
         // If current page is deleted, set current page to first page
         if (currentPage && currentPage._id === id) {
-          setCurrentPage(newPages.length > 0 ? newPages[0] : null);
+          if (newPages.length > 0) {
+            setCurrentPage(newPages[0]);
+            localStorage.setItem('currentPageId', newPages[0]._id);
+            localStorage.setItem('currentPageTitle', newPages[0].title);
+          } else {
+            setCurrentPage(null);
+            localStorage.removeItem('currentPageId');
+            localStorage.removeItem('currentPageTitle');
+          }
         }
         
         showAlert("Page deleted successfully!", "warning");
@@ -122,7 +170,7 @@ const PageState = (props) => {
     <PageContext.Provider value={{ 
       pages, 
       currentPage, 
-      setCurrentPage, 
+      setCurrentPage: updateCurrentPage, 
       getPages, 
       createPage, 
       updatePage, 

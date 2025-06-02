@@ -14,6 +14,7 @@ function Home(props) {
 
   useEffect(() => {
     if (localStorage.getItem('x-api-key')) {
+      // Get pages - the PageState will handle restoring the selected page
       getPages()
     } else {
       navigate('/login')
@@ -21,16 +22,21 @@ function Home(props) {
     // eslint-disable-next-line
   }, [])
 
+  // This useEffect will refresh notes whenever currentPage changes
   useEffect(() => {
     if (currentPage) {
+      // Force a fresh fetch of notes when the page changes
       getNotes(currentPage._id)
+      console.log("Page changed, fetching notes for page:", currentPage.title)
     }
     // eslint-disable-next-line
   }, [currentPage])
 
   const handlePageChange = (e) => {
     const selectedPage = pages.find(page => page._id === e.target.value)
-    setCurrentPage(selectedPage)
+    if (selectedPage) {
+      setCurrentPage(selectedPage)
+    }
   }
 
   if (pageLoading) {
@@ -70,6 +76,13 @@ function Home(props) {
                 ))}
               </select>
               <button 
+                className="btn btn-outline-secondary ms-2"
+                onClick={() => currentPage && getNotes(currentPage._id)}
+                title="Refresh Notes"
+              >
+                <i className="fas fa-sync-alt"></i>
+              </button>
+              <button 
                 className="btn btn-outline-primary ms-2"
                 onClick={() => navigate('/pages')}
                 title="Manage Pages"
@@ -82,7 +95,7 @@ function Home(props) {
           {currentPage && (
             <>
               <AddNote showAlert={showAlert} currentPage={currentPage} />
-              <Notes showAlert={showAlert} loading={noteLoading} />
+              <Notes showAlert={showAlert} loading={noteLoading} currentPageId={currentPage._id} />
             </>
           )}
         </>

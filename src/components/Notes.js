@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import Loading from './Loading'
 
 function Notes(props) {
-  const { showAlert, loading: parentLoading } = props
+  const { showAlert, loading: parentLoading, currentPageId } = props
   const { notes, getNotes, editNote, loading: noteLoading } = useContext(NoteContext)
   const { currentPage } = useContext(PageContext)
   const { theme } = useContext(ThemeContext)
@@ -16,6 +16,7 @@ function Notes(props) {
   const [showFilters, setShowFilters] = useState(false)
   const navigate = useNavigate()
 
+  // This useEffect runs when the component mounts or when currentPage changes
   useEffect(() => {
     if (localStorage.getItem('x-api-key')) {
       if (currentPage) {
@@ -26,6 +27,15 @@ function Notes(props) {
     }
     // eslint-disable-next-line
   }, [currentPage])
+
+  // Additional useEffect specifically for the currentPageId prop
+  useEffect(() => {
+    if (currentPageId && localStorage.getItem('x-api-key')) {
+      console.log("Notes component refreshing for page ID:", currentPageId)
+      getNotes(currentPageId)
+    }
+    // eslint-disable-next-line
+  }, [currentPageId])
 
   const [value, setValue] = useState({ 
     id: "", 

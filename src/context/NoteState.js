@@ -18,6 +18,9 @@ const NoteState = (props) => {
 
   // Clear all state when switching accounts
   const clearState = () => {
+    // Also clear the saved page ID when logging out or switching accounts
+    localStorage.removeItem("currentPageId")
+    localStorage.removeItem("currentPageTitle")
     setNotes([])
     setArchivedNotes([])
     setSearchResults([])
@@ -77,6 +80,9 @@ const NoteState = (props) => {
   const getNotes = async (pageId = null, startDate = "", endDate = "") => {
     setLoading(true)
     try {
+      // Clear existing notes while loading to prevent stale data
+      setNotes([])
+      
       let endpoint = `${url}/getNotes`;
       
       // Add query parameters if provided
@@ -89,13 +95,17 @@ const NoteState = (props) => {
         endpoint += `?${params.toString()}`;
       }
       
+      console.log("Fetching notes with endpoint:", endpoint);
+      
       const response = await axios.get(endpoint, { 
         headers: { 'x-api-key': localStorage.getItem('x-api-key') } 
       });
       
       setNotes(response.data.message || []);
+      console.log(`Fetched ${response.data.message?.length || 0} notes for page ID: ${pageId}`);
     } catch (error) {
       console.error("Error fetching notes:", error);
+      setNotes([]);
     } finally {
       setLoading(false)
     }
