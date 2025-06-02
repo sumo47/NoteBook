@@ -1,17 +1,15 @@
 import React, { useContext } from 'react'
 import NoteContext from '../context/NoteContext'
-import PageContext from '../context/PageContext'
 import ThemeContext from '../context/ThemeContext'
 
-function Noteitem(props) {
-  const { note, updateNote, showAlert } = props
-  const { deleteNote, archiveNote } = useContext(NoteContext)
-  const { currentPage } = useContext(PageContext)
+function ArchivedNoteItem(props) {
+  const { note, showAlert } = props
+  const { restoreNote, deleteNote } = useContext(NoteContext)
   const { theme } = useContext(ThemeContext)
   
   const formattedDate = note?.createdAt?.slice(0, 10).split("-").reverse().join("-")
-
-  // Apply different text color for date based on theme
+  
+  // Theme-specific styles
   const dateTextClass = theme === 'dark' ? 'text-light opacity-75' : 'text-muted'
   const cardTitleClass = theme === 'dark' ? 'text-light' : 'text-dark'
 
@@ -19,29 +17,22 @@ function Noteitem(props) {
     <div className='col-md-4'>
       <div className="card my-3">
         <div className='card-body'>
-          <div className="d-flex align-items-center mb-2">
+          <div className="d-flex align-items-center">
             <h5 className={`card-title mb-0 ${cardTitleClass}`}>{note.title}</h5>
             <div className="ms-auto">
               <button 
-                className="btn btn-sm btn-outline-secondary me-1" 
-                title="Archive Note"
-                onClick={() => archiveNote(note._id, currentPage._id, showAlert)}
+                className="btn btn-sm btn-outline-success me-2" 
+                title="Restore Note"
+                onClick={() => restoreNote(note._id, showAlert)}
               >
-                <i className="fas fa-archive"></i>
-              </button>
-              <button 
-                className="btn btn-sm btn-outline-primary me-1" 
-                title="Edit Note"
-                onClick={() => updateNote(note)}
-              >
-                <i className="fas fa-edit"></i>
+                <i className="fas fa-undo"></i>
               </button>
               <button 
                 className="btn btn-sm btn-outline-danger" 
-                title="Delete Note"
+                title="Delete Permanently"
                 onClick={() => {
-                  if (window.confirm("Are you sure you want to delete this note?")) {
-                    deleteNote(note._id, currentPage._id, showAlert)
+                  if (window.confirm("Delete this note permanently?")) {
+                    deleteNote(note._id, note.pageId, showAlert)
                   }
                 }}
               >
@@ -63,4 +54,4 @@ function Noteitem(props) {
   )
 }
 
-export default Noteitem
+export default ArchivedNoteItem 

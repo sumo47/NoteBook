@@ -6,24 +6,32 @@ import axios from 'axios'
 
 const NoteState = (props) => {
   const [loading, setLoading] = useState(false)
-
-  // const [Name, setName] = useState()
-  // let user = Name
-
-
+  const [notes, setNotes] = useState([])
+  const [archivedNotes, setArchivedNotes] = useState([])
+  const [searchResults, setSearchResults] = useState([])
+  const [isSearching, setIsSearching] = useState(false)
+  
   const url = "https://living-possible-wish.glitch.me";
   // const url = "http://localhost:4000";
 
-  const [notes, setNotes] = useState([])
   let navigate = useNavigate()
 
+  // Clear all state when switching accounts
+  const clearState = () => {
+    setNotes([])
+    setArchivedNotes([])
+    setSearchResults([])
+    setIsSearching(false)
+  }
 
   //*Login
   const login = async (credential, showAlert) => {
-
     const { email, password } = credential
 
     setLoading(true)
+    // Clear state when logging in with a different account
+    clearState()
+    
     await axios.post(`${url}/login`, { email, password })
       .then((res) => {
         const token = res.data.token
@@ -32,23 +40,23 @@ const NoteState = (props) => {
         navigate('/')
       })
       .catch((err) => {
-        // Wow what a nice logic // err will not console everytime while error occurs by user
-        if (err.response.data.status === false) {
+        if (err.response && err.response.data.status === false) {
           showAlert(`${err.response.data.message}`, "danger")
         } else {
           console.log(err)
         }
-
       })
     setLoading(false)
-
   }
-
 
   //*SignUp
   const SignUp = async (credentials, showAlert) => {
     const { name, email, password } = credentials
 
+    setLoading(true)
+    // Clear state when signing up a new account
+    clearState()
+    
     axios.post(`${url}/createUser`, { name, email, password })
       .then((res) => {
         localStorage.setItem("x-api-key", res.data.token)
@@ -56,117 +64,224 @@ const NoteState = (props) => {
         navigate('/')
       })
       .catch((err) => {
-        if (!err.response.data.status) {
+        if (err.response && !err.response.data.status) {
           showAlert(`${err.response.data.message}`, "danger")
         } else {
           console.log(err)
         }
       })
+    setLoading(false)
   }
 
-
   //*GetNotes
-  const getNotes = async (startDate, endDate) => {
+  const getNotes = async (pageId = null, startDate = "", endDate = "") => {
+    setLoading(true)
     try {
-      // Construct query parameters dynamically
-      const params = {};
-      if (startDate) params.startDate = startDate;
-      if (endDate) params.endDate = endDate;
-
-      const newUrl = `${url}/getNotes?${new URLSearchParams(params).toString()}`;
-
-      // Make the API call
-      const { data } = await axios.get(newUrl, {
-        headers: { 'x-api-key': localStorage.getItem('x-api-key') }
+      let endpoint = `${url}/getNotes`;
+      
+      // Add query parameters if provided
+      const params = new URLSearchParams();
+      if (pageId) params.append('pageId', pageId);
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+      
+      if (params.toString()) {
+        endpoint += `?${params.toString()}`;
+      }
+      
+      const response = await axios.get(endpoint, { 
+        headers: { 'x-api-key': localStorage.getItem('x-api-key') } 
       });
-
-      setNotes(data.message);
+      
+      setNotes(response.data.message || []);
     } catch (error) {
-      console.error('Error fetching notes:', error.message);
+      console.error("Error fetching notes:", error);
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
+  // Get archived notes
+  const getArchivedNotes = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.get(`${url}/getArchivedNotes`, { 
+        headers: { 'x-api-key': localStorage.getItem('x-api-key') } 
+      });
+      setArchivedNotes(response.data.message || []);
+    } catch (error) {
+      console.error("Error fetching archived notes:", error);
+    } finally {
+      setLoading(false)
+    }
+  }
 
+  // Search notes
+  const searchNotes = async (query) => {
+    setLoading(true)
+    setIsSearching(true)
+    try {
+      const response = await axios.get(`${url}/searchNotes?query=${query}`, { 
+        headers: { 'x-api-key': localStorage.getItem('x-api-key') } 
+      });
+      setSearchResults(response.data.message || []);
+    } catch (error) {
+      console.error("Error searching notes:", error);
+      setSearchResults([]);
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Clear search
+  const clearSearch = () => {
+    setIsSearching(false);
+    setSearchResults([]);
+  }
 
   //*Add Note
   const addNote = async (note, showAlert) => {
+    setLoading(true)
+    const { title, description, tag, pageId } = note;
 
-    const { title, description, tag } = note
-    setNotes(notes.concat(note))
-
-    await axios.post(`${url}/createNote`, { title, description, tag }, { headers: { 'x-api-key': localStorage.getItem('x-api-key') } })
-      .then((res) => { getNotes() }, showAlert("Added successfully!", "success")
-      )
-      // added successfully alert
-      .catch((err) => {
-        if (!err.response.data.status) {
-          showAlert(`${err.response.data.message}`, "danger")
-        } else {
-          console.log(err)
-        }
-      })
-
-    // setNotes(notes.concat(sample))
+    try {
+      await axios.post(
+        `${url}/createNote`, 
+        { title, description, tag, pageId }, 
+        { headers: { 'x-api-key': localStorage.getItem('x-api-key') } }
+      );
+      
+      getNotes(pageId);
+      showAlert("Added successfully!", "success");
+    } catch (error) {
+      if (error.response && !error.response.data.status) {
+        showAlert(`${error.response.data.message}`, "danger");
+      } else {
+        console.error("Error adding note:", error);
+        showAlert("Failed to add note", "danger");
+      }
+    } finally {
+      setLoading(false)
+    }
   }
-
 
   //*Edit Note
   const editNote = async (note, showAlert) => {
+    setLoading(true)
+    const { id, title, description, tag, pageId } = note;
 
-    const { id, title, description, tag } = note
-
-    await axios.put(`${url}/updateNote/${id}`, { title, description, tag }, { headers: { 'x-api-key': localStorage.getItem('x-api-key') } })
-      .then((res) => {
-        getNotes()
-        showAlert("Edited successfully", "success")
-
-      })
-      .catch((err) => {
-        if (!err.response.data.status) {
-          showAlert(`${err.response.data.message}`, "danger")
-        } else {
-          console.log(err)
-        }
-      })
-
-    // not necessery //! if note not edited in database still this will show edited note 
-
-    let newNotes = [...notes]
-    for (let element of newNotes) {
-      if (id === element._id) {
-        element.title = title;
-        element.description = description;
-        element.tag = tag;
-        break;
+    try {
+      await axios.put(
+        `${url}/updateNote/${id}`, 
+        { title, description, tag, pageId }, 
+        { headers: { 'x-api-key': localStorage.getItem('x-api-key') } }
+      );
+      
+      getNotes(pageId);
+      showAlert("Edited successfully", "success");
+    } catch (error) {
+      if (error.response && !error.response.data.status) {
+        showAlert(`${error.response.data.message}`, "danger");
+      } else {
+        console.error("Error editing note:", error);
+        showAlert("Failed to edit note", "danger");
       }
+    } finally {
+      setLoading(false)
     }
-    setNotes(newNotes)
   }
 
-
   //* Delete Note 
-  const deleteNote = async (id, showAlert) => {
-    const newNotes = notes.filter((note) => { return note._id !== id })
-    setNotes(newNotes)
-    // console.log("Deleting note with id - " + id)
-    await axios.delete(`${url}/deleteNote/${id}`, { headers: { 'x-api-key': localStorage.getItem('x-api-key') } })
-      .then(() => {
-        getNotes()
-        showAlert("Deleted successfully!", "warning")
-      })
-      .catch((err) => {
-        if (!err.response.data.status) {
-          showAlert(`${err.response.data.message}`, "danger")
-        } else {
-          console.log(err)
-        }
-      })
-    // const newNotes = notes.filter((note) => { return note._id !== id })
-    // setNotes(newNotes)
+  const deleteNote = async (id, pageId, showAlert) => {
+    setLoading(true)
+    try {
+      await axios.delete(
+        `${url}/deleteNote/${id}`, 
+        { headers: { 'x-api-key': localStorage.getItem('x-api-key') } }
+      );
+      
+      getNotes(pageId);
+      showAlert("Deleted successfully!", "warning");
+    } catch (error) {
+      if (error.response && !error.response.data.status) {
+        showAlert(`${error.response.data.message}`, "danger");
+      } else {
+        console.error("Error deleting note:", error);
+        showAlert("Failed to delete note", "danger");
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Archive note
+  const archiveNote = async (id, pageId, showAlert) => {
+    setLoading(true)
+    try {
+      await axios.put(
+        `${url}/archiveNote/${id}`, 
+        {}, 
+        { headers: { 'x-api-key': localStorage.getItem('x-api-key') } }
+      );
+      
+      getNotes(pageId);
+      showAlert("Note archived successfully!", "info");
+    } catch (error) {
+      if (error.response && !error.response.data.status) {
+        showAlert(`${error.response.data.message}`, "danger");
+      } else {
+        console.error("Error archiving note:", error);
+        showAlert("Failed to archive note", "danger");
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Restore note from archive
+  const restoreNote = async (id, showAlert) => {
+    setLoading(true)
+    try {
+      await axios.put(
+        `${url}/restoreNote/${id}`, 
+        {}, 
+        { headers: { 'x-api-key': localStorage.getItem('x-api-key') } }
+      );
+      
+      getArchivedNotes();
+      showAlert("Note restored successfully!", "success");
+    } catch (error) {
+      if (error.response && !error.response.data.status) {
+        showAlert(`${error.response.data.message}`, "danger");
+      } else {
+        console.error("Error restoring note:", error);
+        showAlert("Failed to restore note", "danger");
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <NoteContext.Provider value={{ notes, addNote, editNote, deleteNote, getNotes, login, SignUp, loading }} >
+    <NoteContext.Provider value={{ 
+      notes, 
+      archivedNotes,
+      searchResults,
+      isSearching,
+      loading,
+      addNote, 
+      editNote, 
+      deleteNote, 
+      getNotes,
+      getArchivedNotes,
+      archiveNote,
+      restoreNote,
+      searchNotes,
+      clearSearch,
+      clearState,
+      login, 
+      SignUp
+    }}>
       {props.children}
     </NoteContext.Provider>
   )
