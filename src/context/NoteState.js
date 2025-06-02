@@ -11,7 +11,7 @@ const NoteState = (props) => {
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
   
-  const url = "https://notebookbackend.glitch.me";
+  const url = "https://living-possible-wish.glitch.me";
   // const url = "http://localhost:4000";
 
   let navigate = useNavigate()
